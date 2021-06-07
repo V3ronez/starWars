@@ -41,3 +41,36 @@ async function preencherTabela() {
 function swapiGet(param) {
     return axios.get(`https://swapi.dev/api/${param}`);
 }
+
+google.charts.load('current', {
+    'packages': ['corechart']
+});
+
+google.charts.setOnLoadCallback(desenharGrafico);
+
+async function desenharGrafico() {
+    const response = await swapiGet("vehicles/")
+    const vehiclesArray = response.data.results
+
+    const dataArray = []
+    // dataArray.push(["Veículos", "Passageiros"])
+
+    vehiclesArray.forEach((vehicle)  => {
+        dataArray.push([vehicle.name, Number(vehicle.passengers)])
+    })
+
+    // Create the data table.
+    var data = new google.visualization.DataTable();
+    data.addColumn('string', 'Topping');
+    data.addColumn('number', 'Slices');
+    data.addRows(dataArray);
+
+    // Set chart options
+    var options = {
+        'title': 'Maiores veículos'
+    };
+
+    // Instantiate and draw our chart, passing in some options.
+    var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
+}
